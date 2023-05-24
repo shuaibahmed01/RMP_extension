@@ -38,20 +38,23 @@ name_pay_df.columns = column_names
 print(name_pay_df)
 
 # name_pay_df.to_csv('file1.csv')
+name_pay_df = name_pay_df.to_frame(name = "name")
 listr = []
-for row in name_pay_df:
-    # print(type(row))
-    rating = ratemyprofessor.get_professor_by_school_and_name(ratemyprofessor.get_school_by_name("University of California Davis"), row)
-    item = [row,rating]
+for _, row in name_pay_df.iterrows():
+    professor = ratemyprofessor.get_professor_by_school_and_name(ratemyprofessor.get_school_by_name("University of California Davis"), row['name'])
+    if professor is not None:
+        item = [row['name'], professor.rating]
+    else:
+        item = [row['name'], None]
     listr.append(item)
-
-name_pay_df.to_frame()
+   
 
 df_rating = pd.DataFrame(listr, columns=["name","rating"])
 
-name_pay_df.to_frame().merge(df_rating, on="name")
-print(name_pay_df)
 
+merged_df = name_pay_df.merge(df_rating, on="name", how="left")
+print(merged_df)
+merged_df_csv = merged_df.to_csv("combined_data.csv", index = False)
 # # RMP API
 
 
